@@ -1,20 +1,17 @@
 <html>
 
 <body>
-  <script src="https://cdn.rawgit.com/Mourtz/nWGL/bd8e5b8/nWGL.js"></script>
+  <script src="https://cdn.rawgit.com/Mourtz/nWGL/93241b7/nWGL.js"></script>
 
   <script>
-    const WIDTH = window.innerHeight/1.25, HEIGHT = window.innerHeight/1.25;
+    const W_SIZE = window.innerHeight/1.25;
+    let sandbox = new nWGL.main({ "width": W_SIZE, "height": W_SIZE });
 
-    let sandbox = new nWGL.main({ "width": WIDTH, "height": HEIGHT });
-    
     //------------------------- Program -------------------------
-    sandbox.addProgram(
-      [
+    sandbox.addProgram([
         sandbox.addShader("vert.glsl", true, "vertex_shader"),
         sandbox.addShader("Image.glsl", false, "image_shader")
-      ],
-      "mainProgram"
+      ], "mainProgram"
     );
 
     //------------------------- Render Loop -------------------------
