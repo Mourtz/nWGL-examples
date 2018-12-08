@@ -1,7 +1,7 @@
 <html>
 
 <body>
-  <script src="https://cdn.rawgit.com/Mourtz/nWGL/53ffce4f/nWGL.js"></script>
+  <script src="https://cdn.rawgit.com/Mourtz/nWGL/bd8e5b8/nWGL.js"></script>
 
   <script>
     const WIDTH = window.innerHeight/1.25, HEIGHT = window.innerHeight/1.25;
@@ -25,8 +25,7 @@
       sandbox.shaders["pt_shader"] 
     ], "raytracing");
    
-    sandbox.programs["raytracing"].addUniform("u_backbuffer", "1i");
-    sandbox.programs["raytracing"].setUniform("u_backbuffer", 0);
+    sandbox.programs["raytracing"].addUniform("u_backbuffer", "1i", 0);
 
     //------------------------- Display Program -------------------------
     sandbox.addProgram([
@@ -34,29 +33,26 @@
         sandbox.shaders["display_shader"]
       ], "display" );
     
-    sandbox.programs["display"].addUniform("u_cont", "1f");
-    sandbox.programs["display"].setUniform("u_cont", 1);
-    
-    sandbox.programs["display"].addUniform("u_tex", "1i");
-    sandbox.programs["display"].setUniform("u_tex", 1);
+    sandbox.programs["display"].addUniform("u_cont", "1f", 1);    
+    sandbox.programs["display"].addUniform("u_tex", "1i", 1);
 
     //------------------------- Render Loop -------------------------
     let frame = 1;
     (function render() {
       sandbox.program = "raytracing";
 
-      sandbox.setTexture(0, "u_backbuffer", sandbox.textures["tex0"].tex);
+      sandbox.setTexture("u_backbuffer", sandbox.textures["tex0"].tex, 0);
       
-      sandbox.gl.bindFramebuffer(sandbox.gl.FRAMEBUFFER, fb.fb);
+      sandbox.bindFramebuffer(fb.fb);
       fb.setTexture(0, fb.t0);
       sandbox.draw();
 
       sandbox.program = "display";
 
-      sandbox.programs["display"].setUniform("u_cont", 1.0 / frame);
-      sandbox.setTexture(1, "u_tex", fb.t0);
+      sandbox.uniform("u_cont", 1.0 / frame);
+      sandbox.setTexture("u_tex", fb.t0, 1);
       
-      sandbox.gl.bindFramebuffer(sandbox.gl.FRAMEBUFFER, null);
+      sandbox.bindFramebuffer(null);
       sandbox.draw();
 
       // texture ping pong

@@ -1,22 +1,18 @@
 <html>
 
 <body>
-  <script src="https://cdn.rawgit.com/Mourtz/nWGL/53ffce4f/nWGL.js"></script>
+  <script src="https://cdn.rawgit.com/Mourtz/nWGL/bd8e5b8/nWGL.js"></script>
 
   <script>
     const WIDTH = window.innerHeight/1.25, HEIGHT = window.innerHeight/1.25;
 
     let sandbox = new nWGL.main({ "width": WIDTH, "height": HEIGHT });
     
-    //------------------------- Shaders -------------------------
-    let vertex_shader = sandbox.addShader("vert.glsl", true, "vertex_shader");
-    let frag_shader = sandbox.addShader("Image.glsl", false, "image_shader");
-    
     //------------------------- Program -------------------------
     sandbox.addProgram(
       [
-        sandbox.shaders["vertex_shader"],
-        sandbox.shaders["image_shader"]
+        sandbox.addShader("vert.glsl", true, "vertex_shader"),
+        sandbox.addShader("Image.glsl", false, "image_shader")
       ],
       "mainProgram"
     );
