@@ -67,7 +67,6 @@ function render() {
         window.requestAnimationFrame(render);
 };
 
-
 let mouse_down = false;
 let click_pos = null;
 document.addEventListener('mousedown', function(event){;
@@ -82,18 +81,23 @@ document.addEventListener('contextmenu', function(e) {
 document.addEventListener('mousemove', function(event){
     if(!mouse_down) return;
 
+    const translation_step = 0.005;
+
     let delta = [event.x - click_pos[0], event.y - click_pos[1]];
     click_pos = [event.x, event.y];
 
     matrix = nWGL.helper.translate(matrix, -translation[0], -translation[1], -translation[2]);
+    // right click
     if(event.which === 3){
-        temp1 = Math.sin(rotation[1])*delta[1]*0.008;
-        temp2 = Math.cos(rotation[1])*delta[1]*0.008;
+        temp1 = Math.sin(rotation[1])*delta[1]*translation_step;
+        temp2 = Math.cos(rotation[1])*delta[1]*translation_step;
 
         translation[0] -= temp1;
         translation[2] += temp2;
         matrix = nWGL.helper.translate(matrix, -temp1, 0, temp2);
-    } else {
+    } 
+    // left click
+    else if(event.which === 1) {
         delta[0] = nWGL.helper.degToRad(delta[0]*0.08);
         delta[1] = nWGL.helper.degToRad(delta[1]*0.08);
     
@@ -102,6 +106,14 @@ document.addEventListener('mousemove', function(event){
                 
         matrix = nWGL.helper.yRotate(matrix, delta[0]);
         // matrix = nWGL.helper.xRotate(matrix, delta[1]);
+    }
+    // middle mouse button
+    else if(event.which === 2) {
+        temp1 = delta[0]*translation_step;
+
+        translation[0] += temp1;
+
+        matrix = nWGL.helper.translate(matrix, temp1, 0, 0);
     }
     matrix = nWGL.helper.translate(matrix, translation[0], translation[1], translation[2]);
 
