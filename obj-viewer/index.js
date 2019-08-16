@@ -109,11 +109,13 @@ document.addEventListener('mousemove', function(event){
     }
     // middle mouse button
     else if(event.which === 2) {
-        temp1 = delta[0]*translation_step;
+        temp1 = Math.cos(rotation[1])*delta[0]*translation_step;
+        temp2 = Math.sin(rotation[1])*delta[0]*translation_step;
 
         translation[0] += temp1;
+        translation[2] += temp2;
 
-        matrix = nWGL.helper.translate(matrix, temp1, 0, 0);
+        matrix = nWGL.helper.translate(matrix, temp1, 0, temp2);
     }
     matrix = nWGL.helper.translate(matrix, translation[0], translation[1], translation[2]);
 
