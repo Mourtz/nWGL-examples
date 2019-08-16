@@ -36,12 +36,12 @@ indices_buffer2.bind();
 
 //------------------------- Shaders -------------------------
 sandbox.addShader("vert.glsl", "vertex_shader", true);
-sandbox.addShader("display.glsl", "display_shader");
+sandbox.addShader("display.glsl", "display_shader", false);
 
 //------------------------- Display Program -------------------------
 sandbox.addProgram(["vertex_shader", "display_shader"], "display");
 
-var translation = [0, 0, 0];
+var translation = [0, 0, -5];
 var rotation = [nWGL.helper.degToRad(0), nWGL.helper.degToRad(0), nWGL.helper.degToRad(0)];
 var scale = [1, 1, 1];
 var fieldOfViewRadians = nWGL.helper.degToRad(60);
