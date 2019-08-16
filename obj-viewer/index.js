@@ -26,6 +26,9 @@ let indices_buffer2 = sandbox.addBuffer(
     },
     "indices_buffer2");
 
+const total_model_verts = model.faces[0].length;
+model = {}; // free up some memory
+
 vertices_buffer.enableVertexAttribArray({"index": 0, "size": 3});
 normals_buffer.enableVertexAttribArray({"index": 1, "size": 3});
 
@@ -59,7 +62,7 @@ sandbox.programs["display"].addUniform("u_matrix", "Matrix4fv", matrix);
 const realtime = false;
 function render() {
     // sandbox.draw("LINE_LOOP", 6);
-    sandbox.draw("TRIANGLES", model.faces[0].length, true);
+    sandbox.draw("TRIANGLES", total_model_verts, true);
     if(realtime)
         window.requestAnimationFrame(render);
 };
