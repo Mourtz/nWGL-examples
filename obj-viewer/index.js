@@ -42,8 +42,8 @@ sandbox.addShader("display.glsl", "display_shader", false);
 sandbox.addProgram(["vertex_shader", "display_shader"], "display");
 
 var translation = [0, 0, -5];
-var rotation = [nWGL.helper.degToRad(0), nWGL.helper.degToRad(0), nWGL.helper.degToRad(0)];
-var scale = [1, 1, 1];
+var rotation = [0, 0, 0];
+// var scale = [1, 1, 1];
 var fieldOfViewRadians = nWGL.helper.degToRad(60);
 
 // Compute the matrix
@@ -52,10 +52,12 @@ let zNear = 0.001;
 let zFar = 500;
 let matrix = nWGL.helper.perspective(fieldOfViewRadians, aspect, zNear, zFar);
 matrix = nWGL.helper.translate(matrix, translation[0], translation[1], translation[2]);
-matrix = nWGL.helper.xRotate(matrix, rotation[0]);
-matrix = nWGL.helper.yRotate(matrix, rotation[1]);
-matrix = nWGL.helper.zRotate(matrix, rotation[2]);
-matrix = nWGL.helper.scale(matrix, scale[0], scale[1], scale[2]);
+if((rotation[0] + rotation[1] + rotation[2]) !== 0){
+    matrix = nWGL.helper.xRotate(matrix, rotation[0]);
+    matrix = nWGL.helper.yRotate(matrix, rotation[1]);
+    matrix = nWGL.helper.zRotate(matrix, rotation[2]);
+}
+// matrix = nWGL.helper.scale(matrix, scale[0], scale[1], scale[2]);
 sandbox.programs["display"].addUniform("u_matrix", "Matrix4fv", matrix);
 
 //------------------------- Render Loop -------------------------
@@ -82,11 +84,11 @@ document.addEventListener('mousemove', function(event){
     if(!mouse_down) return;
 
     const translation_step = 0.005;
+    const rotation_step = 0.08;
 
     let delta = [event.x - click_pos[0], event.y - click_pos[1]];
     click_pos = [event.x, event.y];
 
-    matrix = nWGL.helper.translate(matrix, -translation[0], -translation[1], -translation[2]);
     // right click
     if(event.which === 3){
         temp1 = Math.sin(rotation[1])*delta[1]*translation_step;
@@ -98,14 +100,16 @@ document.addEventListener('mousemove', function(event){
     } 
     // left click
     else if(event.which === 1) {
-        delta[0] = nWGL.helper.degToRad(delta[0]*0.08);
-        delta[1] = nWGL.helper.degToRad(delta[1]*0.08);
+        temp1 = nWGL.helper.degToRad(delta[0]*rotation_step);
+        // temp2 = nWGL.helper.degToRad(delta[1]*rotation_step);
     
-        rotation[1] += delta[0];
-        // rotation[0] += delta[1];
-                
-        matrix = nWGL.helper.yRotate(matrix, delta[0]);
-        // matrix = nWGL.helper.xRotate(matrix, delta[1]);
+        rotation[1] += temp1;
+        // rotation[0] += temp2;
+   
+        matrix = nWGL.helper.translate(matrix, -translation[0], -translation[1], -translation[2]);
+        matrix = nWGL.helper.yRotate(matrix, temp1);
+        matrix = nWGL.helper.translate(matrix, translation[0], translation[1], translation[2]);
+        // matrix = nWGL.helper.xRotate(matrix, temp2);
     }
     // middle mouse button
     else if(event.which === 2) {
@@ -117,7 +121,6 @@ document.addEventListener('mousemove', function(event){
 
         matrix = nWGL.helper.translate(matrix, temp1, 0, temp2);
     }
-    matrix = nWGL.helper.translate(matrix, translation[0], translation[1], translation[2]);
 
     sandbox.programs["display"].addUniform("u_matrix", "Matrix4fv", matrix);
     if(!realtime) render();
