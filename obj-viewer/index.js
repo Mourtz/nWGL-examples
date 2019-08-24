@@ -227,14 +227,17 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-document.addEventListener('touchstart', function(event){;
-    click_pos = [event.touches[0].clientX, event.touches[0].clientY];
+document.addEventListener('touchstart', function(event){
+    click_pos = [];
+    for(const touch of event.touches){
+        click_pos.push(touch.clientX, touch.clientY);
+    }
+
     mouse_down = true;
 });
 
 document.addEventListener('touchmove', function(event){
     if(!mouse_down) return;
-    console.log("touch event detected!", event);
 
     const translation_step = 0.005;
     const rotation_step = 0.08;
@@ -259,13 +262,14 @@ document.addEventListener('touchmove', function(event){
         const pos2Y = event.touches[1].clientY;
 
         // pan
-        if(Math.abs(posY-pos2Y) < window.innerHeight*0.2){
+        if(Math.abs(posX-pos2X) < window.innerWidth*0.2 && 
+            Math.abs(posY-pos2Y) < window.innerHeight*0.2){
 
         }
         // pinch
         else {
-            temp1 = Math.sin(rotation[1])*(pos2Y - click_pos[1])*translation_step;
-            temp2 = Math.cos(rotation[1])*(pos2Y - click_pos[1])*translation_step;
+            temp1 = Math.sin(rotation[1])*((posX+pos2X)-(click_pos[0] + click_pos[2]))*translation_step;
+            temp2 = Math.cos(rotation[1])*((posX+pos2X)-(click_pos[0] + click_pos[2]))*translation_step;
 
             translation[0] -= temp1;
             translation[2] += temp2;
