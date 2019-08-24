@@ -227,4 +227,56 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
+document.addEventListener('touchstart', function(event){;
+    click_pos = [event.touches[0].clientX, event.touches[0].clientY];
+    mouse_down = true;
+});
+
+document.addEventListener('touchmove', function(event){
+    if(!mouse_down) return;
+    console.log("touch event detected!", event);
+
+    const translation_step = 0.005;
+    const rotation_step = 0.08;
+
+    const touches = event.touches.length;
+    const posX = event.touches[0].clientX;
+    const posY = event.touches[0].clientY;
+
+    if(touches === 1){
+        temp1 = nWGL.helper.degToRad((posX - click_pos[0])*rotation_step);
+        // temp2 = nWGL.helper.degToRad(delta[1]*rotation_step);
+    
+        rotation[1] += temp1;
+        // rotation[0] += temp2;
+    
+        matrix = nWGL.helper.translate(matrix, -translation[0], -translation[1], -translation[2]);
+        matrix = nWGL.helper.yRotate(matrix, temp1);
+        matrix = nWGL.helper.translate(matrix, translation[0], translation[1], translation[2]);
+        // matrix = nWGL.helper.xRotate(matrix, temp2);
+    } else if(touches === 2){
+        const pos2X = event.touches[1].clientX;
+        const pos2Y = event.touches[1].clientY;
+
+        // pan
+        if(Math.abs(posY-pos2Y) < window.innerHeight*0.2){
+
+        }
+        // pinch
+        else {
+            temp1 = Math.sin(rotation[1])*(pos2Y - click_pos[1])*translation_step;
+            temp2 = Math.cos(rotation[1])*(pos2Y - click_pos[1])*translation_step;
+
+            translation[0] -= temp1;
+            translation[2] += temp2;
+            matrix = nWGL.helper.translate(matrix, -temp1, 0, temp2);
+        }
+    }
+
+    click_pos = [posX, posY];
+
+    sandbox.programs["display"].addUniform("u_matrix", "Matrix4fv", matrix);
+    if(!realtime) render();
+});
+
 render();
