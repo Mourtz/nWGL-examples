@@ -261,8 +261,24 @@ document.addEventListener('touchmove', function(event){
         // matrix = nWGL.helper.xRotate(matrix, temp2);
     } else if(touches === 2){
         // touch_delta = Math.sqrt(Math.pow(posX-pos2X, 2) + Math.pow(posY-pos2Y, 2)*2)-touch_delta;
-        let delta = click_pos[0]-posX + click_pos[1]-posY + click_pos[2]-pos2X + click_pos[3]-pos2Y;
-        delta *= 0.1;
+        
+        let delta = 0;
+        if(posX > pos2X){
+            delta += click_pos[0]-posX;
+            delta += pos2X-click_pos[2];
+        } else {
+            delta += click_pos[2]-pos2X;
+            delta += posX-click_pos[0];
+        }
+
+        if(posY > pos2Y){
+            delta += click_pos[1]-posY;
+            delta += pos2Y-click_pos[3];
+        } else {
+            delta += click_pos[3]-pos2Y;
+            delta += posY-click_pos[1];
+        }
+        delta *= 0.2;
 
         // pan
         if(Math.abs(posX-pos2X) < window.innerWidth*0.2 && 
