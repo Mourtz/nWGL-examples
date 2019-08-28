@@ -263,20 +263,20 @@ document.addEventListener('touchmove', function(event){
         // touch_delta = Math.sqrt(Math.pow(posX-pos2X, 2) + Math.pow(posY-pos2Y, 2)*2)-touch_delta;
         
         let delta = 0;
+        // should probably move the origin to the center of the screen instead of doing that
         if(posX > pos2X){
-            delta += click_pos[0]-posX;
-            delta += pos2X-click_pos[2];
-        } else {
             delta += click_pos[2]-pos2X;
             delta += posX-click_pos[0];
-        }
-
-        if(posY > pos2Y){
-            delta += click_pos[1]-posY;
-            delta += pos2Y-click_pos[3];
         } else {
+            delta += click_pos[0]-posX;
+            delta += pos2X-click_pos[2];
+        }
+        if(posY > pos2Y){
             delta += click_pos[3]-pos2Y;
             delta += posY-click_pos[1];
+        } else {
+            delta += click_pos[1]-posY;
+            delta += pos2Y-click_pos[3];
         }
         delta *= 0.8;
 
