@@ -227,6 +227,7 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
+let touch_delta = 0;
 document.addEventListener('touchstart', function(event){
     click_pos = [];
     for(const touch of event.touches){
@@ -245,8 +246,8 @@ document.addEventListener('touchmove', function(event){
     const touches = event.touches.length;
     const posX =    event.touches[0].clientX;
     const posY =    event.touches[0].clientY;
-    const pos2X =   event.touches[1] || event.touches[1].clientX;
-    const pos2Y =   event.touches[1] || event.touches[1].clientY;
+    const pos2X =   event.touches[1] && event.touches[1].clientX;
+    const pos2Y =   event.touches[1] && event.touches[1].clientY;
 
     if(touches === 1){
         temp1 = nWGL.helper.degToRad((posX - click_pos[0])*rotation_step);
@@ -260,7 +261,7 @@ document.addEventListener('touchmove', function(event){
         matrix = nWGL.helper.translate(matrix, translation[0], translation[1], translation[2]);
         // matrix = nWGL.helper.xRotate(matrix, temp2);
     } else if(touches === 2){
-        let delta = Math.sqrt(Math.pow(posX-pos2X, 2) + Math.pow(posY-pos2Y, 2)*2);
+        touch_delta = Math.sqrt(Math.pow(posX-pos2X, 2) + Math.pow(posY-pos2Y, 2)*2)-touch_delta;
         
         // pan
         if(Math.abs(posX-pos2X) < window.innerWidth*0.2 && 
