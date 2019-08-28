@@ -243,8 +243,10 @@ document.addEventListener('touchmove', function(event){
     const rotation_step = 0.08;
 
     const touches = event.touches.length;
-    const posX = event.touches[0].clientX;
-    const posY = event.touches[0].clientY;
+    const posX =    event.touches[0].clientX;
+    const posY =    event.touches[0].clientY;
+    const pos2X =   event.touches[1] || event.touches[1].clientX;
+    const pos2Y =   event.touches[1] || event.touches[1].clientY;
 
     if(touches === 1){
         temp1 = nWGL.helper.degToRad((posX - click_pos[0])*rotation_step);
@@ -258,18 +260,16 @@ document.addEventListener('touchmove', function(event){
         matrix = nWGL.helper.translate(matrix, translation[0], translation[1], translation[2]);
         // matrix = nWGL.helper.xRotate(matrix, temp2);
     } else if(touches === 2){
-        const pos2X = event.touches[1].clientX;
-        const pos2Y = event.touches[1].clientY;
-
+        let delta = Math.sqrt(Math.pow(posX-pos2X, 2) + Math.pow(posY-pos2Y, 2)*2);
+        
         // pan
         if(Math.abs(posX-pos2X) < window.innerWidth*0.2 && 
             Math.abs(posY-pos2Y) < window.innerHeight*0.2){
-
         }
         // pinch
         else {
-            temp1 = Math.sin(rotation[1])*((posX+pos2X)-(click_pos[0] + click_pos[2]))*translation_step;
-            temp2 = Math.cos(rotation[1])*((posX+pos2X)-(click_pos[0] + click_pos[2]))*translation_step;
+            temp1 = Math.sin(rotation[1])*delta*translation_step;
+            temp2 = Math.cos(rotation[1])*delta*translation_step;
 
             translation[0] -= temp1;
             translation[2] += temp2;
@@ -277,7 +277,7 @@ document.addEventListener('touchmove', function(event){
         }
     }
 
-    click_pos = [posX, posY];
+    click_pos = [posX, posY, pos2X, pos2Y];
 
     sandbox.programs["display"].addUniform("u_matrix", "Matrix4fv", matrix);
     if(!realtime) render();
