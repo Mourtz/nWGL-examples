@@ -227,7 +227,6 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-let touch_delta = 0;
 document.addEventListener('touchstart', function(event){
     click_pos = [];
     for(const touch of event.touches){
@@ -261,16 +260,17 @@ document.addEventListener('touchmove', function(event){
         matrix = nWGL.helper.translate(matrix, translation[0], translation[1], translation[2]);
         // matrix = nWGL.helper.xRotate(matrix, temp2);
     } else if(touches === 2){
-        touch_delta = Math.sqrt(Math.pow(posX-pos2X, 2) + Math.pow(posY-pos2Y, 2)*2)-touch_delta;
-        
+        // touch_delta = Math.sqrt(Math.pow(posX-pos2X, 2) + Math.pow(posY-pos2Y, 2)*2)-touch_delta;
+        let delta = click_pos[0]-posX + click_pos[1]-posY + click_pos[2]-pos2X + click_pos[3]-pos2Y;
+
         // pan
         if(Math.abs(posX-pos2X) < window.innerWidth*0.2 && 
             Math.abs(posY-pos2Y) < window.innerHeight*0.2){
         }
         // pinch
         else {
-            temp1 = Math.sin(rotation[1])*touch_delta*translation_step;
-            temp2 = Math.cos(rotation[1])*touch_delta*translation_step;
+            temp1 = Math.sin(rotation[1])*delta*translation_step;
+            temp2 = Math.cos(rotation[1])*delta*translation_step;
 
             translation[0] -= temp1;
             translation[2] += temp2;
