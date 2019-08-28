@@ -269,8 +269,8 @@ document.addEventListener('touchmove', function(event){
         }
         // pinch
         else {
-            temp1 = Math.sin(rotation[1])*delta*translation_step;
-            temp2 = Math.cos(rotation[1])*delta*translation_step;
+            temp1 = Math.sin(rotation[1])*touch_delta*translation_step;
+            temp2 = Math.cos(rotation[1])*touch_delta*translation_step;
 
             translation[0] -= temp1;
             translation[2] += temp2;
