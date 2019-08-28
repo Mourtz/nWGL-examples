@@ -278,7 +278,7 @@ document.addEventListener('touchmove', function(event){
             delta += click_pos[3]-pos2Y;
             delta += posY-click_pos[1];
         }
-        delta *= 0.2;
+        delta *= 0.8;
 
         // pan
         if(Math.abs(posX-pos2X) < window.innerWidth*0.2 && 
