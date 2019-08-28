@@ -262,6 +262,7 @@ document.addEventListener('touchmove', function(event){
     } else if(touches === 2){
         // touch_delta = Math.sqrt(Math.pow(posX-pos2X, 2) + Math.pow(posY-pos2Y, 2)*2)-touch_delta;
         let delta = click_pos[0]-posX + click_pos[1]-posY + click_pos[2]-pos2X + click_pos[3]-pos2Y;
+        delta *= 0.1;
 
         // pan
         if(Math.abs(posX-pos2X) < window.innerWidth*0.2 && 
