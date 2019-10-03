@@ -41,24 +41,26 @@ sandbox.addShader("display.glsl", "display_shader", false);
 //------------------------- Display Program -------------------------
 sandbox.addProgram(["vertex_shader", "display_shader"], "display");
 
-var translation = [0, 0, -5];
-var rotation = [0, 0, 0];
-// var scale = [1, 1, 1];
-var fieldOfViewRadians = nWGL.helper.degToRad(60);
+let model_matrix = new Float32Array(16);
+model_matrix[0] = 1;
+model_matrix[5] = 1;
+model_matrix[10] = 1;
+model_matrix[15] = 1;
 
-// Compute the matrix
+let view_matrix = nWGL.helper.lookAt([0, 0, -5], [0, 0, 0], [0, 1, 0])
+let view_rotation = [0, 0, 0];
+
+let fieldOfViewRadians = nWGL.helper.degToRad(60);
 let aspect = sandbox.gl.canvas.clientWidth / sandbox.gl.canvas.clientHeight;
 let zNear = 0.001;
 let zFar = 500;
-let matrix = nWGL.helper.perspective(fieldOfViewRadians, aspect, zNear, zFar);
-matrix = nWGL.helper.translate(matrix, translation[0], translation[1], translation[2]);
-if((rotation[0] + rotation[1] + rotation[2]) !== 0){
-    matrix = nWGL.helper.xRotate(matrix, rotation[0]);
-    matrix = nWGL.helper.yRotate(matrix, rotation[1]);
-    matrix = nWGL.helper.zRotate(matrix, rotation[2]);
-}
+let projection_matrix = nWGL.helper.perspective(fieldOfViewRadians, aspect, zNear, zFar);
+let projection_translation = [0, 0, 0];
+
 // matrix = nWGL.helper.scale(matrix, scale[0], scale[1], scale[2]);
-sandbox.programs["display"].addUniform("u_matrix", "Matrix4fv", matrix);
+sandbox.programs["display"].addUniform("u_model_matrix", "Matrix4fv", model_matrix);
+sandbox.programs["display"].addUniform("u_view_matrix", "Matrix4fv", view_matrix);
+sandbox.programs["display"].addUniform("u_projection_matrix", "Matrix4fv", projection_matrix);
 
 //------------------------- Render Loop -------------------------
 const realtime = false;
@@ -83,46 +85,52 @@ document.addEventListener('contextmenu', function(e) {
 document.addEventListener('mousemove', function(event){
     if(!mouse_down) return;
 
-    const translation_step = 0.005;
-    const rotation_step = 0.08;
-
     let delta = [event.x - click_pos[0], event.y - click_pos[1]];
     click_pos = [event.x, event.y];
 
     // right click
     if(event.which === 3){
-        temp1 = Math.sin(rotation[1])*delta[1]*translation_step;
-        temp2 = Math.cos(rotation[1])*delta[1]*translation_step;
-
-        translation[0] -= temp1;
-        translation[2] += temp2;
-        matrix = nWGL.helper.translate(matrix, -temp1, 0, temp2);
+        // @ToDo Better way has to be found for zooming
+        fieldOfViewRadians = Math.max(0.174533, fieldOfViewRadians + nWGL.helper.degToRad(delta[1]*0.1));
+        projection_matrix = nWGL.helper.perspective(fieldOfViewRadians, aspect, zNear, zFar);
+        projection_matrix = nWGL.helper.translate(projection_matrix, projection_translation[0], projection_translation[1], 0);
+        sandbox.programs["display"].addUniform("u_projection_matrix", "Matrix4fv", projection_matrix);
     } 
     // left click
     else if(event.which === 1) {
-        temp1 = nWGL.helper.degToRad(delta[0]*rotation_step);
-        // temp2 = nWGL.helper.degToRad(delta[1]*rotation_step);
+        temp1 = nWGL.helper.degToRad(delta[0]*10);
+        temp2 = nWGL.helper.degToRad(delta[1]*10);
     
-        rotation[1] += temp1;
-        // rotation[0] += temp2;
+        view_rotation[0] += temp2;
+        view_rotation[1] += temp1;
    
-        matrix = nWGL.helper.translate(matrix, -translation[0], -translation[1], -translation[2]);
-        matrix = nWGL.helper.yRotate(matrix, temp1);
-        matrix = nWGL.helper.translate(matrix, translation[0], translation[1], translation[2]);
-        // matrix = nWGL.helper.xRotate(matrix, temp2);
+        let left = [], up = [], forward = [];
+        nWGL.helper.anglesToAxes(view_rotation, left, up, forward);
+        view_matrix[0] = left[0];
+        view_matrix[1] = left[1];
+        view_matrix[2] = left[2];
+
+        view_matrix[4] = up[0];
+        view_matrix[5] = up[1];
+        view_matrix[6] = up[2];
+
+        view_matrix[8] = forward[0];
+        view_matrix[9] = forward[1];
+        view_matrix[10] = forward[2];
+        sandbox.programs["display"].addUniform("u_view_matrix", "Matrix4fv", view_matrix);
     }
     // middle mouse button
     else if(event.which === 2) {
-        temp1 = Math.cos(rotation[1])*delta[0]*translation_step;
-        temp2 = Math.sin(rotation[1])*delta[0]*translation_step;
+        temp1 = delta[0]*0.005;
+        temp2 = delta[1]*0.005;
 
-        translation[0] += temp1;
-        translation[2] += temp2;
-
-        matrix = nWGL.helper.translate(matrix, temp1, 0, temp2);
+        projection_translation[0] += temp1;
+        projection_translation[1] -= temp2;
+        projection_matrix = nWGL.helper.translate(projection_matrix, temp1, -temp2, 0);
+        sandbox.programs["display"].addUniform("u_projection_matrix", "Matrix4fv", projection_matrix);
     }
 
-    sandbox.programs["display"].addUniform("u_matrix", "Matrix4fv", matrix);
+    // sandbox.programs["display"].addUniform("u_model_matrix", "Matrix4fv", model_matrix);
     if(!realtime) render();
 });
 
@@ -130,6 +138,7 @@ document.addEventListener('mouseup', function(event){
     mouse_down = false;
 });
 
+/*
 document.addEventListener('keydown', function(event) {
     const translation_step = [1, 1, 1];
     const rotation_step = [
@@ -226,7 +235,7 @@ document.addEventListener('keydown', function(event) {
             break;
     }
 });
-
+*/
 document.addEventListener('touchstart', function(event){
     click_pos = [];
     for(const touch of event.touches){
@@ -240,7 +249,6 @@ document.addEventListener('touchmove', function(event){
     if(!mouse_down) return;
 
     const translation_step = 0.005;
-    const rotation_step = 0.08;
 
     const touches = event.touches.length;
     const posX =    event.touches[0].clientX;
@@ -249,16 +257,26 @@ document.addEventListener('touchmove', function(event){
     const pos2Y =   event.touches[1] && event.touches[1].clientY;
 
     if(touches === 1){
-        temp1 = nWGL.helper.degToRad((posX - click_pos[0])*rotation_step);
-        // temp2 = nWGL.helper.degToRad(delta[1]*rotation_step);
+        temp1 = nWGL.helper.degToRad((posX - click_pos[0])*10);
+        temp2 = nWGL.helper.degToRad((posY - click_pos[1])*10);
     
-        rotation[1] += temp1;
-        // rotation[0] += temp2;
+        view_rotation[0] += temp2;
+        view_rotation[1] += temp1;
     
-        matrix = nWGL.helper.translate(matrix, -translation[0], -translation[1], -translation[2]);
-        matrix = nWGL.helper.yRotate(matrix, temp1);
-        matrix = nWGL.helper.translate(matrix, translation[0], translation[1], translation[2]);
-        // matrix = nWGL.helper.xRotate(matrix, temp2);
+        let left = [], up = [], forward = [];
+        nWGL.helper.anglesToAxes(view_rotation, left, up, forward);
+        view_matrix[0] = left[0];
+        view_matrix[1] = left[1];
+        view_matrix[2] = left[2];
+
+        view_matrix[4] = up[0];
+        view_matrix[5] = up[1];
+        view_matrix[6] = up[2];
+
+        view_matrix[8] = forward[0];
+        view_matrix[9] = forward[1];
+        view_matrix[10] = forward[2];
+        sandbox.programs["display"].addUniform("u_view_matrix", "Matrix4fv", view_matrix);
     } else if(touches === 2){
         // touch_delta = Math.sqrt(Math.pow(posX-pos2X, 2) + Math.pow(posY-pos2Y, 2)*2)-touch_delta;
         
@@ -285,18 +303,16 @@ document.addEventListener('touchmove', function(event){
         }
         // pinch
         else {
-            temp1 = Math.sin(rotation[1])*delta*translation_step;
-            temp2 = Math.cos(rotation[1])*delta*translation_step;
-
-            translation[0] -= temp1;
-            translation[2] += temp2;
-            matrix = nWGL.helper.translate(matrix, -temp1, 0, temp2);
+            // @ToDo Better way has to be found for zooming
+            fieldOfViewRadians = Math.max(0.174533, fieldOfViewRadians + nWGL.helper.degToRad(delta*0.1));
+            projection_matrix = nWGL.helper.perspective(fieldOfViewRadians, aspect, zNear, zFar);
+            projection_matrix = nWGL.helper.translate(projection_matrix, projection_translation[0], projection_translation[1], 0);
+            sandbox.programs["display"].addUniform("u_projection_matrix", "Matrix4fv", projection_matrix);
         }
     }
 
     click_pos = [posX, posY, pos2X, pos2Y];
 
-    sandbox.programs["display"].addUniform("u_matrix", "Matrix4fv", matrix);
     if(!realtime) render();
 });
 
