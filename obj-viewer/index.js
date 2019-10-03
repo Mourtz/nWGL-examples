@@ -304,7 +304,7 @@ document.addEventListener('touchmove', function(event){
         // pinch
         else {
             // @ToDo Better way has to be found for zooming
-            fieldOfViewRadians = Math.max(0.174533, fieldOfViewRadians + nWGL.helper.degToRad(delta*0.1));
+            fieldOfViewRadians = Math.max(0.174533, fieldOfViewRadians + nWGL.helper.degToRad(-delta*0.1));
             projection_matrix = nWGL.helper.perspective(fieldOfViewRadians, aspect, zNear, zFar);
             projection_matrix = nWGL.helper.translate(projection_matrix, projection_translation[0], projection_translation[1], 0);
             sandbox.programs["display"].addUniform("u_projection_matrix", "Matrix4fv", projection_matrix);
