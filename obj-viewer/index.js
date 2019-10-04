@@ -242,8 +242,8 @@ document.addEventListener('touchmove', function(event){
     const pos2Y =   event.touches[1] && event.touches[1].clientY;
 
     if(touches === 1){
-        camera.rotateLocalX(nWGL.helper.degToRad((posX - click_pos[0])*0.1));
-        camera.rotateLocalY(nWGL.helper.degToRad((posY - click_pos[1])*0.1));
+        camera.rotateLocalX(nWGL.helper.degToRad((posX - click_pos[1])*0.1));
+        camera.rotateLocalY(nWGL.helper.degToRad((posY - click_pos[0])*0.1));
         sandbox.programs["display"].addUniform("u_view_matrix", "Matrix4fv", camera.view_matrix);
     } else if(touches === 2){
         // touch_delta = Math.sqrt(Math.pow(posX-pos2X, 2) + Math.pow(posY-pos2Y, 2)*2)-touch_delta;
@@ -271,7 +271,7 @@ document.addEventListener('touchmove', function(event){
                 delta += pos2Y-click_pos[3];
             }
 
-            camera.moveForward(0.1*delta);
+            camera.moveForward(-0.1*delta);
             sandbox.programs["display"].addUniform("u_view_matrix", "Matrix4fv", camera.view_matrix);
         }
     }
