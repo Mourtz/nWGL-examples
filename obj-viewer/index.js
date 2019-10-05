@@ -1,7 +1,7 @@
 const canvas_size = [window.innerWidth, window.innerHeight];
 let canvas_scale = 1;
 
-let sandbox = new nWGL.main({ "width": canvas_size[0], "height": canvas_size[1], "disable_quad_vbo": true, "enableDepthTest": true, "autoClear": true });
+let sandbox = new nWGL.main({ "width": canvas_size[0], "height": canvas_size[1], "disable_quad_vbo": true, "enableDepthTest": true, "enableCulling": true, "autoClear": true });
 
 //------------------------- Buffers -------------------------
 
@@ -66,7 +66,7 @@ sandbox.programs["display"].addUniform("u_view_matrix", "Matrix4fv", camera.view
 sandbox.programs["display"].addUniform("u_projection_matrix", "Matrix4fv", camera.projection_matrix);
 
 //------------------------- Render Loop -------------------------
-const realtime = false;
+const realtime = true;
 function render() {
     // sandbox.draw("LINE_LOOP", 6);
     sandbox.draw("TRIANGLES", total_model_verts, true, 27);
