@@ -62,6 +62,10 @@ sandbox.programs["display"].addUniform("u_model_matrix", "Matrix4fv", model_matr
 sandbox.programs["display"].addUniform("u_view_matrix", "Matrix4fv", camera.view_matrix);
 sandbox.programs["display"].addUniform("u_projection_matrix", "Matrix4fv", camera.projection_matrix);
 
+window.addEventListener('resize', (e) => {
+    sandbox.programs["display"].addUniform("u_projection_matrix", "Matrix4fv", camera.projection_matrix);
+}, false);
+
 //------------------------- Render Loop -------------------------
 const realtime = true;
 function render() {
