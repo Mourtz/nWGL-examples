@@ -1,7 +1,4 @@
-const canvas_size = [window.innerWidth, window.innerHeight];
-let canvas_scale = 1;
-
-let sandbox = new nWGL.main({ "width": canvas_size[0], "height": canvas_size[1], "disable_quad_vbo": true, "enableDepthTest": true, "enableCulling": true, "autoClear": true });
+let sandbox = new nWGL.main({ "fullscreen": true, "disable_quad_vbo": true, "enableDepthTest": true, "enableCulling": true, "autoClear": true });
 
 //------------------------- Buffers -------------------------
 

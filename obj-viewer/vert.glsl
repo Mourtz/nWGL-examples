@@ -32,5 +32,5 @@ void main() {
   model += vec4((gl_InstanceID-el_p_row*row)*4, (row-el_p_row*depth)*3, depth*4, 0.0);
 
   gl_Position = u_projection_matrix * u_view_matrix * model;
-  v_normal = a_normal;
+  v_normal = a_normal; // dont update normals
 }
